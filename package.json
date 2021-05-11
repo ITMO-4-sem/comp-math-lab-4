@@ -15,6 +15,7 @@
   "license": "ISC",
   "homepage": "https://github.com/Learning-and-Courses/webpack-starter#readme",
   "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.6",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
@@ -37,5 +38,7 @@
     "webpack-cli": "^4.6.0",
     "webpack-dev-server": "^3.11.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  }
 }

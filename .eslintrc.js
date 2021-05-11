@@ -22,6 +22,7 @@ module.exports = {
         'semi': 'off',
         '@typescript-eslint/semi': ['error'], // semicolon at the end of line (just
         // like in Java) )
-        '@typescript-eslint/no-inferrable-types': 'off'
+        '@typescript-eslint/no-inferrable-types': 'off',
+        '@typescript-eslint/no-array-constructor': 'off'
     }
 };
