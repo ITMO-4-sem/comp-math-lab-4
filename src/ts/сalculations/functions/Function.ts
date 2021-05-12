@@ -1,3 +1,5 @@
+import { FunctionName } from '@ts/сalculations/functions/FunctionName';
+
 
 export abstract class Function {
 
@@ -11,5 +13,9 @@ export abstract class Function {
     }
 
     public abstract calc(x: number): number;
+
+    public abstract getLatexRepresentation(rounding?: number): string;
+
+    public abstract getName(): FunctionName;
 
 }

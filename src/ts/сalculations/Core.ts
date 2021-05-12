@@ -12,112 +12,188 @@ import { LogarithmicFunction } from '@ts/сalculations/functions/LogarithmicFunc
 import { PowerFunction } from '@ts/сalculations/functions/PowerFunction';
 import { QuadraticFunction } from '@ts/сalculations/functions/QuadraticFunction';
 import { Function } from '@ts/сalculations/functions/Function';
+import { FunctionName } from '@ts/сalculations/functions/FunctionName';
 
 
 export class Core {
 
 
-    public do(table: Table): CoreResult {
+    public calculate(table: Table): Array<FunctionResult> {
 
         const n = table.size();
-        const yValues = table.getYValues();
-        const xValues = table.getXValues();
+        const tableYValues = table.getYValues();
+        const tableXValues = table.getXValues();
 
         const exponentialApproxResult: ApproximationResult = new ExponentialApproximation().approximate(table);
-        const exponentialFunction: ExponentialFunction = new ExponentialFunction(
-            exponentialApproxResult.a, exponentialApproxResult.b
-        );
-        const exponentialFunctionYValues = this.prepareApproxFuncYValues(xValues, exponentialFunction);
-        const exponentialFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, exponentialFunctionYValues);
-        const exponentialFunctionStandardDeviation = this.calcStandardDeviation(exponentialFunctionDeviationMeasure, n);
-        const exponentialFunctionReliability = this.calcApproximationFunctionReliability(exponentialFunctionDeviationMeasure, exponentialFunctionYValues, n);
-
-
         const linearApproxResult: ApproximationResultExtended = new LinearApproximation().approximate(table);
-        const linearFunction: LinearFunction = new LinearFunction(
+        const logarithmicApproxResult: ApproximationResult = new LogarithmicApproximation().approximate(table);
+        const powerApproxResult: ApproximationResult = new PowerApproximation().approximate(table);
+        const quadraticApproxResult: ApproximationResultExtended = new QuadraticApproximation().approximate(table);
+
+
+        const approxResultsArray: Array<ApproximationResult> = new Array<ApproximationResult>();
+        approxResultsArray.push( exponentialApproxResult );
+        approxResultsArray.push( linearApproxResult );
+        approxResultsArray.push( logarithmicApproxResult );
+        approxResultsArray.push( powerApproxResult );
+        approxResultsArray.push( quadraticApproxResult );
+
+
+        const functionsArray: Array<Function> = new Array<Function>();
+
+        functionsArray.push( new ExponentialFunction(
+            exponentialApproxResult.a, exponentialApproxResult.b
+        ) );
+        functionsArray.push( new LinearFunction(
             linearApproxResult.a,
             linearApproxResult.b
-        );
-        const linearFunctionYValues = this.prepareApproxFuncYValues(xValues, linearFunction);
-        const linearFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, linearFunctionYValues);
-        const linearFunctionStandardDeviation = this.calcStandardDeviation(linearFunctionDeviationMeasure, n);
-        const linearFunctionReliability = this.calcApproximationFunctionReliability(linearFunctionDeviationMeasure, linearFunctionYValues, n);
-
-
-
-        const logarithmicApproxResult: ApproximationResult = new LogarithmicApproximation().approximate(table);
-        const logarithmicFunction: LogarithmicFunction = new LogarithmicFunction(
+        ) );
+        functionsArray.push( new LogarithmicFunction(
             logarithmicApproxResult.a,
             logarithmicApproxResult.b
-        );
-        const logarithmicFunctionYValues = this.prepareApproxFuncYValues(xValues, logarithmicFunction);
-        const logarithmicFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, logarithmicFunctionYValues);
-        const logarithmicFunctionStandardDeviation = this.calcStandardDeviation(logarithmicFunctionDeviationMeasure, n);
-        const logarithmicFunctionReliability = this.calcApproximationFunctionReliability(logarithmicFunctionDeviationMeasure, logarithmicFunctionYValues, n);
-
-
-        const powerApproxResult: ApproximationResult = new PowerApproximation().approximate(table);
-        const powerFunction: PowerFunction = new PowerFunction(
+        ) );
+        functionsArray.push( new PowerFunction(
             powerApproxResult.a,
             powerApproxResult.b
-        );
-        const powerFunctionYValues = this.prepareApproxFuncYValues(xValues, powerFunction);
-        const powerFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, powerFunctionYValues);
-        const powerFunctionStandardDeviation = this.calcStandardDeviation(powerFunctionDeviationMeasure, n);
-        const powerFunctionReliability = this.calcApproximationFunctionReliability(powerFunctionStandardDeviation, powerFunctionYValues, n);
-
-
-
-        const quadraticApproxResult: ApproximationResultExtended = new QuadraticApproximation().approximate(table);
-        const quadraticFunction: QuadraticFunction = new QuadraticFunction(
+        ) );
+        functionsArray.push( new QuadraticFunction(
             quadraticApproxResult.a,
             quadraticApproxResult.b,
             quadraticApproxResult.ext
-        );
-        const quadraticFunctionYValues = this.prepareApproxFuncYValues(xValues, quadraticFunction);
-        const quadraticFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, quadraticFunctionYValues);
-        const quadraticFunctionStandardDeviation = this.calcStandardDeviation(quadraticFunctionDeviationMeasure, n);
-        const quadraticFunctionReliability = this.calcApproximationFunctionReliability(quadraticFunctionDeviationMeasure, quadraticFunctionYValues, n);
+        ) );
 
-        return {
-            linearFunction: {
-                approxResult: linearApproxResult,
-                yValues: linearFunctionYValues,
-                deviationMeasure: logarithmicFunctionDeviationMeasure, // S
-                standardDeviation: linearFunctionStandardDeviation, // СКО
-                approximationReliability: linearFunctionReliability,
+        const functionsResultsArray: Array<FunctionResult> = new Array<FunctionResult>();
 
-            },
-            logarithmicFunction: {
-                approxResult: logarithmicApproxResult,
-                yValues: logarithmicFunctionYValues,
-                deviationMeasure: logarithmicFunctionDeviationMeasure, // S
-                standardDeviation: logarithmicFunctionStandardDeviation, // СКО
-                approximationReliability: logarithmicFunctionReliability,
 
-            },
-            powerFunction: {
-                approxResult: powerApproxResult,
-                yValues: powerFunctionYValues,
-                deviationMeasure: powerFunctionDeviationMeasure, // S
-                standardDeviation: powerFunctionStandardDeviation, // СКО
-                approximationReliability: powerFunctionReliability,
-            },
-            quadraticFunction: {
-                approxResult: quadraticApproxResult,
-                yValues: quadraticFunctionYValues,
-                deviationMeasure: quadraticFunctionDeviationMeasure, // S
-                standardDeviation: quadraticFunctionStandardDeviation, // СКО
-                approximationReliability: quadraticFunctionReliability,
-            },
-            exponentialFunction: {
-                approxResult: exponentialApproxResult,
-                yValues: exponentialFunctionYValues,
-                deviationMeasure: exponentialFunctionDeviationMeasure, // S
-                standardDeviation: exponentialFunctionStandardDeviation, // СКО
-                approximationReliability: exponentialFunctionReliability,
-            }
-        };
+        for ( let i = 0; i < 5; i++ ) {
+
+            const func = functionsArray[i];
+            const approxResult = approxResultsArray[i];
+
+            // console.log('func = ', func);
+            // console.log('approxResult = ', approxResult);
+
+            const yValues = this.prepareApproxFuncYValues(tableXValues, func);
+            console.log('yValues = ', yValues);
+            const deviationMeasure = this.calcDeviationMeasure(tableYValues, yValues);
+            const standardDeviation = this.calcStandardDeviation(deviationMeasure, n);
+            const approximationReliability = this.calcApproximationFunctionReliability(deviationMeasure, yValues, n);
+
+            functionsResultsArray.push(
+                {
+                    funcName: func.getName(),
+                    func,
+                    yValues,
+                    approxResult,
+                    approximationReliability,
+                    deviationMeasure,
+                    standardDeviation,
+                }
+            );
+        }
+
+        return functionsResultsArray;
+        //
+        // const exponentialApproxResult: ApproximationResult = new ExponentialApproximation().approximate(table);
+        // const exponentialFunction: ExponentialFunction = new ExponentialFunction(
+        //     exponentialApproxResult.a, exponentialApproxResult.b
+        // );
+        // const exponentialFunctionYValues = this.prepareApproxFuncYValues(xValues, exponentialFunction);
+        // const exponentialFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, exponentialFunctionYValues);
+        // const exponentialFunctionStandardDeviation = this.calcStandardDeviation(exponentialFunctionDeviationMeasure, n);
+        // const exponentialFunctionReliability = this.calcApproximationFunctionReliability(exponentialFunctionDeviationMeasure, exponentialFunctionYValues, n);
+        //
+        //
+        // const linearApproxResult: ApproximationResultExtended = new LinearApproximation().approximate(table);
+        // const linearFunction: LinearFunction = new LinearFunction(
+        //     linearApproxResult.a,
+        //     linearApproxResult.b
+        // );
+        // const linearFunctionYValues = this.prepareApproxFuncYValues(xValues, linearFunction);
+        // const linearFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, linearFunctionYValues);
+        // const linearFunctionStandardDeviation = this.calcStandardDeviation(linearFunctionDeviationMeasure, n);
+        // const linearFunctionReliability = this.calcApproximationFunctionReliability(linearFunctionDeviationMeasure, linearFunctionYValues, n);
+        //
+        //
+        //
+        // const logarithmicApproxResult: ApproximationResult = new LogarithmicApproximation().approximate(table);
+        // const logarithmicFunction: LogarithmicFunction = new LogarithmicFunction(
+        //     logarithmicApproxResult.a,
+        //     logarithmicApproxResult.b
+        // );
+        // const logarithmicFunctionYValues = this.prepareApproxFuncYValues(xValues, logarithmicFunction);
+        // const logarithmicFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, logarithmicFunctionYValues);
+        // const logarithmicFunctionStandardDeviation = this.calcStandardDeviation(logarithmicFunctionDeviationMeasure, n);
+        // const logarithmicFunctionReliability = this.calcApproximationFunctionReliability(logarithmicFunctionDeviationMeasure, logarithmicFunctionYValues, n);
+        //
+        //
+        // const powerApproxResult: ApproximationResult = new PowerApproximation().approximate(table);
+        // const powerFunction: PowerFunction = new PowerFunction(
+        //     powerApproxResult.a,
+        //     powerApproxResult.b
+        // );
+        // const powerFunctionYValues = this.prepareApproxFuncYValues(xValues, powerFunction);
+        // const powerFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, powerFunctionYValues);
+        // const powerFunctionStandardDeviation = this.calcStandardDeviation(powerFunctionDeviationMeasure, n);
+        // const powerFunctionReliability = this.calcApproximationFunctionReliability(powerFunctionStandardDeviation, powerFunctionYValues, n);
+        //
+        //
+        //
+        // const quadraticApproxResult: ApproximationResultExtended = new QuadraticApproximation().approximate(table);
+        // const quadraticFunction: QuadraticFunction = new QuadraticFunction(
+        //     quadraticApproxResult.a,
+        //     quadraticApproxResult.b,
+        //     quadraticApproxResult.ext
+        // );
+        // const quadraticFunctionYValues = this.prepareApproxFuncYValues(xValues, quadraticFunction);
+        // const quadraticFunctionDeviationMeasure = this.calcDeviationMeasure(yValues, quadraticFunctionYValues);
+        // const quadraticFunctionStandardDeviation = this.calcStandardDeviation(quadraticFunctionDeviationMeasure, n);
+        // const quadraticFunctionReliability = this.calcApproximationFunctionReliability(quadraticFunctionDeviationMeasure, quadraticFunctionYValues, n);
+        //
+        // return {
+        //     linearFunction: {
+        //         func: linearFunction,
+        //         approxResult: linearApproxResult,
+        //         yValues: linearFunctionYValues,
+        //         deviationMeasure: logarithmicFunctionDeviationMeasure, // S
+        //         standardDeviation: linearFunctionStandardDeviation, // СКО
+        //         approximationReliability: linearFunctionReliability,
+        //
+        //     },
+        //     logarithmicFunction: {
+        //         func: logarithmicFunction,
+        //         approxResult: logarithmicApproxResult,
+        //         yValues: logarithmicFunctionYValues,
+        //         deviationMeasure: logarithmicFunctionDeviationMeasure, // S
+        //         standardDeviation: logarithmicFunctionStandardDeviation, // СКО
+        //         approximationReliability: logarithmicFunctionReliability,
+        //
+        //     },
+        //     powerFunction: {
+        //         func: powerFunction,
+        //         approxResult: powerApproxResult,
+        //         yValues: powerFunctionYValues,
+        //         deviationMeasure: powerFunctionDeviationMeasure, // S
+        //         standardDeviation: powerFunctionStandardDeviation, // СКО
+        //         approximationReliability: powerFunctionReliability,
+        //     },
+        //     quadraticFunction: {
+        //         func: quadraticFunction,
+        //         approxResult: quadraticApproxResult,
+        //         yValues: quadraticFunctionYValues,
+        //         deviationMeasure: quadraticFunctionDeviationMeasure, // S
+        //         standardDeviation: quadraticFunctionStandardDeviation, // СКО
+        //         approximationReliability: quadraticFunctionReliability,
+        //     },
+        //     exponentialFunction: {
+        //         func: exponentialFunction,
+        //         approxResult: exponentialApproxResult,
+        //         yValues: exponentialFunctionYValues,
+        //         deviationMeasure: exponentialFunctionDeviationMeasure, // S
+        //         standardDeviation: exponentialFunctionStandardDeviation, // СКО
+        //         approximationReliability: exponentialFunctionReliability,
+        //     }
+        // };
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -170,6 +246,9 @@ export class Core {
 }
 
 export interface FunctionResult {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    funcName: FunctionName,
+    func: Function,
     approxResult: ApproximationResult,
     yValues: Array<number>,
     deviationMeasure: number, // S
@@ -177,10 +256,10 @@ export interface FunctionResult {
     approximationReliability: number
 }
 
-export interface CoreResult {
-    exponentialFunction: FunctionResult;
-    linearFunction: FunctionResult,
-    logarithmicFunction: FunctionResult,
-    powerFunction: FunctionResult,
-    quadraticFunction: FunctionResult
-}
+// export interface CoreResult {
+//     exponentialFunction: FunctionResult;
+//     linearFunction: FunctionResult,
+//     logarithmicFunction: FunctionResult,
+//     powerFunction: FunctionResult,
+//     quadraticFunction: FunctionResult
+// }

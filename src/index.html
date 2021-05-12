@@ -6,12 +6,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="favicon.svg">
   <title>webpack-starter</title>
+  <script
+  defer
+  src="https://www.desmos.com/api/v1.6/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 </head>
 <body>
 
+<div class="notification notification--hidden">
+  <p class="notification__content"></p>
+</div>
 
-<div class="container"></div>
+<header class="header">
+  Аппроксимация функции
+</header>
 
+<div class="container">
+
+  <p class="heading">Введите значения x и y или выберите файл с таблицей</p>
+
+  <textarea class="textarea" name="" id="" cols="36" rows="2"></textarea>
+
+
+  <div class="file-input">
+    <label class="file-input__label">
+      Choose file
+      <input class="file-input__input" type="file" accept=".txt">
+    </label>
+    <span class="file-input__status">No file chosen</span>
+  </div>
+
+  <button class="button button-submit">Вперед</button>
+
+  <hr class="hr">
+
+  <p class="heading"> Результаты аппроксимации</p>
+
+  <div class="desmos"></div>
+
+  <hr class="hr">
+
+  <p class="medium"> Лучшая функция</p>
+  <pre class="best-function"></pre>
+
+  <hr class="hr">
+
+  <p class="medium"> Результат всех функций</p>
+  <pre class="general-result"></pre>
+
+</div>
+
+
+<!--<div class="chart-container">-->
+<!--  <canvas class="chart-container__chart"></canvas>-->
+<!--</div>-->
+<footer class="footer">
+  Лаба сделана Максимом Монаховым
+</footer>
 
 </body>
 </html>
